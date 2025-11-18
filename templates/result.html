@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Analysis Result</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+    <h1>Analysis Result</h1>
+
+    {% if hashes %}
+    <h2>File Hashes</h2>
+    <pre>{{ hashes | safe }}</pre>
+    {% endif %}
+
+    <h2>Threat Intelligence Result</h2>
+    <pre>{{ result | safe }}</pre>
+
+    <a href="/">Back</a>
+</body>
+</html>

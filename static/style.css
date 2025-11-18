@@ -1,0 +1,17 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 40px;
+}
+
+h1, h2 {
+    margin-bottom: 15px;
+}
+
+section {
+    margin-bottom: 35px;
+}
+
+input, button {
+    padding: 8px;
+    margin: 4px 0;
+}
