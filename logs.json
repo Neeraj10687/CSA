@@ -625,5 +625,15 @@
         }
       }
     }
+  },
+  {
+    "timestamp": "2025-11-18T22:53:32",
+    "event_type": "manual_url_scan",
+    "file_path": null,
+    "url": "hi",
+    "hashes": null,
+    "vt_result": {
+      "error": "URL submission failed"
+    }
   }
 ]

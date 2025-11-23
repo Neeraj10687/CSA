@@ -1,17 +1,5 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 40px;
-}
-
-h1, h2 {
-    margin-bottom: 15px;
-}
-
-section {
-    margin-bottom: 35px;
-}
-
-input, button {
-    padding: 8px;
-    margin: 4px 0;
-}
+body { font-family: Arial; margin: 20px; }
+nav a { margin: 0 10px; text-decoration: none; }
+ul#events { list-style: none; padding: 0; }
+ul#events li { padding: 4px 0; border-bottom: 1px solid #ccc; }
+form { margin: 15px 0; }

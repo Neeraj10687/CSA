@@ -7,6 +7,7 @@ from logger import log_event
 import time
 from flask import Response, render_template
 from event_store import get_events
+from notifier import notify
 
 
 
