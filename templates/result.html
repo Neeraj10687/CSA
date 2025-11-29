@@ -1,21 +1,90 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Analysis Result</title>
+    <title>Threat Scan Result</title>
     <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 30px; background: #0e0e0e; color: #eee; }
+        h1 { text-align: center; margin-bottom: 30px; }
+        .card { background:#1c1c1c; padding:20px; border-radius:12px; margin-bottom:25px; }
+        table { width:100%; border-collapse:collapse; margin-top:10px; }
+        th, td { padding:12px; border-bottom:1px solid #333; text-align:left; }
+        th { color:#9be2ff; font-size:18px; }
+        .btn-back { display:block; text-align:center; margin-top:25px; color:#fff; background:#0084ff; padding:12px; border-radius:10px; text-decoration:none; font-weight:bold;}
+        .badge { padding:6px 12px; border-radius:6px; font-weight:bold; }
+        .malicious { background:#ff4d4d; }
+        .suspicious { background:#f2c200; }
+        .clean { background:#4cd964; }
+    </style>
 </head>
 
 <body>
-    <h1>Analysis Result</h1>
+    <h1>Threat Scan Results</h1>
 
+     <div id="loading">
+        <h2>Analyzing file with VirusTotal...</h2>
+        <div class="spinner"></div>
+    </div>
+
+    <div id="content" style="display:none;">
     {% if hashes %}
-    <h2>File Hashes</h2>
-    <pre>{{ hashes | safe }}</pre>
+    <div class="card">
+        <h2>File Hashes</h2>
+        <table>
+            {% for key, value in hashes.items() %}
+            <tr>
+                <th>{{ key }}</th>
+                <td>{{ value }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
     {% endif %}
 
-    <h2>Threat Intelligence Result</h2>
-    <pre>{{ result | safe }}</pre>
+    <div class="card">
+        <h2>VirusTotal Scan</h2>
+        {% set malicious = vt_result.values()|selectattr("result", "equalto", "malicious")|list %}
+        {% set suspicious = vt_result.values()|selectattr("result", "equalto", "suspicious")|list %}
+        {% set clean = vt_result.values()|selectattr("result", "equalto", "clean")|list %}
 
-    <a href="/">Back</a>
+        <div class="card">
+            <h3>Summary</h3>
+            <p>Total Engines: {{ vt_result|length }}</p>
+            <p class="malicious badge">Malicious: {{ malicious|length }}</p>
+            <p class="suspicious badge">Suspicious: {{ suspicious|length }}</p>
+            <p class="clean badge">Clean: {{ clean|length }}</p>
+        </div>
+        <table>
+            <tr>
+                <th>Engine</th>
+                <th>Status</th>
+            </tr>
+            {% for engine, info in vt_result.items() %}
+            <tr>
+                <td>{{ engine }}</td>
+                <td>
+                    <span class="badge 
+                        {% if info.result == 'malicious' %}malicious
+                        {% elif info.result == 'suspicious' %}suspicious
+                        {% else %}clean
+                        {% endif %}
+                    ">
+                        {{ info.result }}
+                    </span>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <a href="/" class="btn-back">Back to Dashboard</a>
+    </div> <!-- end content -->
+    <script>
+        window.onload = function() {
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("content").style.display = "block";
+        }
+    </script>
+
 </body>
 </html>

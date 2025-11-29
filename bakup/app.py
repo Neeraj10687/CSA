@@ -22,6 +22,50 @@ def home():
 
     return render_template("index.html")
 
+
+@app.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html")
+
+@app.route("/history")
+def history():
+    event_type = request.args.get("type")
+    filter_by = {"event_type": event_type} if event_type else None
+    logs = fetch_logs(filter_by)
+    return render_template("history.html", logs=logs)
+
+@app.route("/scan", methods=["GET", "POST"])
+def scan():
+    result = None
+    if request.method == "POST":
+        if "file" in request.files:
+            f = request.files["file"]
+            f.save(f.filename)
+            hashes = compute_hashes(f.filename)
+            vt_result = check_filehash_virustotal(hashes["sha256"])
+            log_event("manual_file_scan", file_path=f.filename, hashes=hashes, vt_result=vt_result)
+            notify("manual_file_scan", file_path=f.filename, hashes=hashes, vt_result=vt_result)
+            result = {"file": f.filename, "hashes": hashes, "vt_result": vt_result}
+        elif "url" in request.form:
+            url = request.form["url"]
+            vt_result = check_filehash_virustotal(url)  # Or URL check API
+            log_event("manual_url_scan", url=url, vt_result=vt_result)
+            notify("manual_url_scan", url=url, vt_result=vt_result)
+            result = {"url": url, "vt_result": vt_result}
+    return render_template("scan.html", result=result)
+
+@app.route("/stream_events")
+def stream_events():
+    def event_stream():
+        seen_ids = set()
+        while True:
+            events = get_events()
+            for e in events:
+                if e["id"] not in seen_ids:
+                    yield f"data: {json.dumps(e)}\n\n"
+                    seen_ids.add(e["id"])
+            time.sleep(1)
+    return Response(event_stream(), mimetype="text/event-stream")
 @app.route("/watch_log")
 def watch_log():
     return render_template("watch_log.html")
@@ -53,12 +97,10 @@ def check_url():
         url=url,
         vt_result=result
     )
-    
 
     return render_template(
         "result.html",
-        vt_result=result,
-        #result=json.dumps(result, indent=4),
+        result=json.dumps(result, indent=4),
         hashes=None
     )
 
@@ -96,10 +138,8 @@ def upload_file():
 
     return render_template(
         "result.html",
-        #result=json.dumps(vt_result, indent=4),
-        vt_result=vt_result,
-        #hashes=json.dumps(hashes, indent=4)
-        hashes=hashes
+        result=json.dumps(vt_result, indent=4),
+        hashes=json.dumps(hashes, indent=4)
     )
 
 @app.route("/logs")

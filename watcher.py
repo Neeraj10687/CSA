@@ -63,5 +63,5 @@ def start_watcher():
     observer.join()
 
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     start_watcher()
